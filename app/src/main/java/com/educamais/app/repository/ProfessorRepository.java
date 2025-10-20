@@ -5,11 +5,8 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.educamais.app.model.Aluno;
+import com.educamais.app.model.Professor;
 
-
-public interface AlunoRepository extends JpaRepository<Aluno, UUID>{
-
+public interface ProfessorRepository extends JpaRepository<Professor, UUID>{
     public UserDetails findByLogin(String login);
-
 }
