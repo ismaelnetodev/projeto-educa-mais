@@ -34,4 +34,30 @@ public class TurmaService {
         return this.turmaRepository.findAll();
     }
 
+    public Optional<Turma> getTurma(Long id){
+        return this.turmaRepository.findById(id);
+    }
+
+    public Turma updateTurma(Long id, TurmaCadastroDTO data){
+        Optional<Turma> turmaExistenteOpcional = this.turmaRepository.findById(id);
+
+        if (turmaExistenteOpcional.isEmpty()){
+            return null;
+        }
+
+        Turma turmaExistente = turmaExistenteOpcional.get();
+        turmaExistente.setNome(data.nome());
+        turmaExistente.setAnoLetivo(data.anoLetivo());
+        return this.turmaRepository.save(turmaExistente);
+    }
+
+    public Turma deleteTurma(Long id){
+        Optional<Turma> turma = this.turmaRepository.findById(id);
+        if (turma.isPresent()) {
+            this.turmaRepository.deleteById(id);
+            return turma.get();
+        }
+        return null;
+    }
+
 }
