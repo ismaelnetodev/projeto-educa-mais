@@ -1,0 +1,11 @@
+package com.educamais.app.dtos;
+
+import java.util.UUID;
+
+import com.educamais.app.model.Aluno;
+
+public record AlunoResponseDTO(UUID id, String nome, String login, String matricula, String turmaNome) {
+    public AlunoResponseDTO(Aluno aluno){
+        this(aluno.getId(), aluno.getNome(), aluno.getLogin(), aluno.getMatricula(), aluno.getTurma() != null ? aluno.getTurma().getNome() : "Sem turma");
+    }
+}

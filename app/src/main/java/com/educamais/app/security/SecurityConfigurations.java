@@ -30,6 +30,9 @@ public class SecurityConfigurations {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, "/auth/login").permitAll();
+                    req.requestMatchers("/v3/api-docs/**").permitAll();
+                    req.requestMatchers("/swagger-ui/**").permitAll();
+                    req.requestMatchers("/swagger-ui.html").permitAll();
 
                     //PERMISSÕES DO GESTOR
                     req.requestMatchers(HttpMethod.GET, "/alunos").hasRole("ADMIN");
