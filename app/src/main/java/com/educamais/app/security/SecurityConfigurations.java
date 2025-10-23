@@ -42,6 +42,10 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/turmas").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.PUT, "/turmas/**").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.DELETE, "/turmas/**").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.GET, "/professores").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.POST, "/professores").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.DELETE, "/professores/**").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.PUT, "/professores/**").hasRole("ADMIN");
 
                     req.requestMatchers(HttpMethod.GET, "/turmas").hasAnyRole("ADMIN", "PROFESSOR");
 
