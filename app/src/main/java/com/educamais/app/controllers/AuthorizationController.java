@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 
 import com.educamais.app.dtos.LoginDTO;
-import com.educamais.app.dtos.TokenDTO;
+import com.educamais.app.dtos.LoginResponseDTO;
 import com.educamais.app.model.User;
 import com.educamais.app.security.TokenService;
 
@@ -26,11 +26,13 @@ public class AuthorizationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO data){
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
         var token = tokenService.generateToken(user);
-        return ResponseEntity.ok(new TokenDTO(token));
+        var role = user.getRole().toString();
+        var responseDTO = new LoginResponseDTO(token, role);
+        return ResponseEntity.ok(responseDTO);
     }
 }
