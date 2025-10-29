@@ -12,6 +12,8 @@ import com.educamais.app.model.Turma;
 import com.educamais.app.repository.ProfessorRepository;
 import com.educamais.app.repository.TurmaRepository;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class TurmaService {
 
@@ -35,10 +37,12 @@ public class TurmaService {
         return this.turmaRepository.save(novaTurma);
     }
 
+    @Transactional(readOnly = true)
     public List<Turma> listarTurmas(){
         return this.turmaRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Optional<Turma> getTurma(Long id){
         return this.turmaRepository.findById(id);
     }

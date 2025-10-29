@@ -1,15 +1,12 @@
 package com.educamais.app.services;
 
-import java.net.PasswordAuthentication;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.context.support.BeanDefinitionDsl.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.educamais.app.dtos.AlunoCadastroDTO;
 import com.educamais.app.dtos.ProfessorCadastroDTO;
 import com.educamais.app.enums.Roles;
 import com.educamais.app.model.Professor;

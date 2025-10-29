@@ -34,22 +34,27 @@ public class TurmaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Turma>> listarTurmas(){
+    public ResponseEntity<List<TurmaResponseDTO>> listarTurmas(){
         List<Turma> turmas = turmaService.listarTurmas();
-        List<TurmaResponseDTO> turmaResponseDTO = turmas.stream()
+
+        if (turmas.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        List<TurmaResponseDTO> dtos = turmas.stream()
             .map(TurmaResponseDTO::new)
             .collect(Collectors.toList());
-        return ResponseEntity.ok().body(turmas);
+        return ResponseEntity.ok().body(dtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Turma> getTurma(@PathVariable Long id) {
+    public ResponseEntity<TurmaResponseDTO> getTurma(@PathVariable Long id) {
         Optional<Turma> turma = turmaService.getTurma(id);
         if (turma.isEmpty()){
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(turma.get());
+        TurmaResponseDTO turmaResponseDTO = new TurmaResponseDTO(turma.get());
+        return ResponseEntity.ok(turmaResponseDTO);
     }
 
     @PostMapping
@@ -60,17 +65,19 @@ public class TurmaController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Uma turma com o mesmo nome e ano letivo já existe");
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(turmaSalva);
+        TurmaResponseDTO responseDTO = new TurmaResponseDTO(turmaSalva);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Turma> atualizarTurma(@PathVariable Long id, @RequestBody TurmaCadastroDTO data) {
+    public ResponseEntity<TurmaResponseDTO> atualizarTurma(@PathVariable Long id, @RequestBody TurmaCadastroDTO data) {
         Turma turmaAtualizada = this.turmaService.updateTurma(id, data);
         if (turmaAtualizada == null){
             return ResponseEntity.notFound().build();
         }
+        TurmaResponseDTO responseDTO = new TurmaResponseDTO(turmaAtualizada);
 
-        return ResponseEntity.ok(turmaAtualizada);
+        return ResponseEntity.ok(responseDTO);
     }
 
     @DeleteMapping("/{id}")
@@ -84,10 +91,11 @@ public class TurmaController {
     }
 
     @PostMapping("/{turmaId}/associar-professor")
-    public ResponseEntity<Turma> associarProfessor(@PathVariable Long turmaId, @RequestBody AssociacaoProfessorDTO data) {
+    public ResponseEntity<TurmaResponseDTO> associarProfessor(@PathVariable Long turmaId, @RequestBody AssociacaoProfessorDTO data) {
         try{
             Turma turmaAtualizada = turmaService.associarProfessor(turmaId, data.professorId());
-            return ResponseEntity.ok(turmaAtualizada);
+            TurmaResponseDTO responseDTO = new TurmaResponseDTO(turmaAtualizada);
+            return ResponseEntity.ok(responseDTO);
         }catch (RuntimeException e){
             return ResponseEntity.notFound().build();
         }
