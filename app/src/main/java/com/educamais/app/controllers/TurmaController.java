@@ -2,6 +2,7 @@ package com.educamais.app.controllers;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.educamais.app.dtos.AssociacaoProfessorDTO;
 import com.educamais.app.dtos.TurmaCadastroDTO;
+import com.educamais.app.dtos.TurmaResponseDTO;
 import com.educamais.app.model.Turma;
 import com.educamais.app.services.TurmaService;
 
@@ -33,6 +36,9 @@ public class TurmaController {
     @GetMapping
     public ResponseEntity<List<Turma>> listarTurmas(){
         List<Turma> turmas = turmaService.listarTurmas();
+        List<TurmaResponseDTO> turmaResponseDTO = turmas.stream()
+            .map(TurmaResponseDTO::new)
+            .collect(Collectors.toList());
         return ResponseEntity.ok().body(turmas);
     }
 
@@ -76,5 +82,16 @@ public class TurmaController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{turmaId}/associar-professor")
+    public ResponseEntity<Turma> associarProfessor(@PathVariable Long turmaId, @RequestBody AssociacaoProfessorDTO data) {
+        try{
+            Turma turmaAtualizada = turmaService.associarProfessor(turmaId, data.professorId());
+            return ResponseEntity.ok(turmaAtualizada);
+        }catch (RuntimeException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
 
 }

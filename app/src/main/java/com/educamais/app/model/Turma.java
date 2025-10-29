@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -22,6 +23,17 @@ public class Turma {
 
     @OneToMany(mappedBy = "turma")
     private List<Aluno> alunos;
+
+    @ManyToMany(mappedBy = "turmas")
+    private List<Professor> professores;
+
+    public List<Professor> getProfessores() {
+        return professores;
+    }
+
+    public void setProfessores(List<Professor> professores) {
+        this.professores = professores;
+    }
 
     public Turma(){}
 

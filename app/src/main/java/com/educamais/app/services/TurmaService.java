@@ -2,20 +2,25 @@ package com.educamais.app.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.educamais.app.dtos.TurmaCadastroDTO;
+import com.educamais.app.model.Professor;
 import com.educamais.app.model.Turma;
+import com.educamais.app.repository.ProfessorRepository;
 import com.educamais.app.repository.TurmaRepository;
 
 @Service
 public class TurmaService {
 
     private final TurmaRepository turmaRepository;
+    private final ProfessorRepository professorRepository;
 
-    public TurmaService(TurmaRepository turmaRepository){
+    public TurmaService(TurmaRepository turmaRepository, ProfessorRepository professorRepository){
         this.turmaRepository = turmaRepository;
+        this.professorRepository = professorRepository;
     }
 
     public Turma criarTurma(TurmaCadastroDTO data){
@@ -58,6 +63,18 @@ public class TurmaService {
             return turma.get();
         }
         return null;
+    }
+
+    public Turma associarProfessor(Long turmaId, UUID professorId){
+        Turma turma = turmaRepository.findById(turmaId).orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+
+
+        Professor professor = professorRepository.findById(professorId).orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+
+        professor.getTurmas().add(turma);
+
+        professorRepository.save(professor);
+        return turma;
     }
 
 }
