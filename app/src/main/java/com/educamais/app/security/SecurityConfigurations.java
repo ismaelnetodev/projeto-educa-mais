@@ -2,6 +2,7 @@ package com.educamais.app.security;
 
 import java.util.List;
 
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -48,12 +49,17 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/turmas").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.PUT, "/turmas/**").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.DELETE, "/turmas/**").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.POST, "/turmas/{turmaId}/associar-professor").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.GET, "/professores").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.POST, "/professores").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.DELETE, "/professores/**").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.PUT, "/professores/**").hasRole("ADMIN");
 
+                    //PROFESSOR E GESTOR
+                    req.requestMatchers(HttpMethod.GET, "/alunos/{id}").hasAnyRole("ADMIN", "PROFESSOR");
                     req.requestMatchers(HttpMethod.GET, "/turmas").hasAnyRole("ADMIN", "PROFESSOR");
+                    req.requestMatchers(HttpMethod.POST, "/avaliacoes").hasAnyRole("ADMIN", "PROFESSOR");
+                    req.requestMatchers(HttpMethod.GET, "/professores/minhas-turmas").hasAnyRole("ADMIN", "PROFESSOR");
 
                     req.anyRequest().authenticated();
                 })
