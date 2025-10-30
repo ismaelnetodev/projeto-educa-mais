@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.educamais.app.dtos.TurmaCadastroDTO;
+import com.educamais.app.model.Aluno;
 import com.educamais.app.model.Professor;
 import com.educamais.app.model.Turma;
 import com.educamais.app.repository.ProfessorRepository;
@@ -79,6 +80,12 @@ public class TurmaService {
 
         professorRepository.save(professor);
         return turma;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Aluno> getAlunosPorTurma(Long turmaId){
+        Turma turma = turmaRepository.findById(turmaId).orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+        return turma.getAlunos();
     }
 
 }

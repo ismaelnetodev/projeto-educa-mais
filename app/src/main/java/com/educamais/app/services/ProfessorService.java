@@ -48,12 +48,16 @@ public class ProfessorService {
     // Retornar um professor por ID
     public Professor getProfessor(UUID id) {
         Optional<Professor> professor = professorRepository.findById(id);
+        if (professor.isEmpty()) return null;
         return professor.get();
     }
     
     // Atualizar professor
     public Professor updateProfessor(UUID id, ProfessorCadastroDTO data) {
         Optional<Professor> professor = professorRepository.findById(id);
+
+        if (professor.isEmpty()) return null;
+
         Professor professorAtualizado = professor.get();
         professorAtualizado.setNome(data.nome());
         professorAtualizado.setLogin(data.login());

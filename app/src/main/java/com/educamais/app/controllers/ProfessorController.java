@@ -85,7 +85,7 @@ public class ProfessorController {
     public ResponseEntity<Void> detelarProfessor(@PathVariable UUID id) {
         Professor professor = professorService.deleteProfessor(id);
         if (professor == null) {
-            ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.noContent().build();
     }

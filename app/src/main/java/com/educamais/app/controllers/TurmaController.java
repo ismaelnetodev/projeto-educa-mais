@@ -14,13 +14,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.educamais.app.dtos.AlunoResponseDTO;
 import com.educamais.app.dtos.AssociacaoProfessorDTO;
 import com.educamais.app.dtos.TurmaCadastroDTO;
 import com.educamais.app.dtos.TurmaResponseDTO;
+import com.educamais.app.model.Aluno;
 import com.educamais.app.model.Turma;
 import com.educamais.app.services.TurmaService;
 
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -100,6 +104,22 @@ public class TurmaController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/{turmaId}/alunos")
+    public ResponseEntity<List<AlunoResponseDTO>> getAlunosDaTurma(@PathVariable Long turmaId) {
+        try{
+            List<Aluno> alunos = turmaService.getAlunosPorTurma(turmaId);
+
+            List<AlunoResponseDTO> dtos = alunos.stream()
+                .map(AlunoResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok().body(dtos);
+        } catch (RuntimeException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
     
 
 }
