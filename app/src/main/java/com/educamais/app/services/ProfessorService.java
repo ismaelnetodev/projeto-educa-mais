@@ -4,12 +4,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.educamais.app.dtos.ProfessorCadastroDTO;
 import com.educamais.app.enums.Roles;
 import com.educamais.app.model.Professor;
+import com.educamais.app.model.Turma;
 import com.educamais.app.repository.ProfessorRepository;
 
 @Service
@@ -67,5 +72,25 @@ public class ProfessorService {
             return professor.get();
         }
         return null;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Turma> getMinhasTurmas(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String login;
+
+        if (authentication.getPrincipal() instanceof UserDetails){
+            login = ((UserDetails) authentication.getPrincipal()).getUsername();
+        }else{
+            login = authentication.getPrincipal().toString();
+        }
+
+        Professor professor = (Professor) professorRepository.findByLogin(login);
+
+        if (professor == null){
+            throw new RuntimeException("Professor não encontrado");
+        }
+
+        return professor.getTurmas();
     }
 }

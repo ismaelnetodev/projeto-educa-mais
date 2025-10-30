@@ -5,11 +5,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.educamais.app.dtos.ProfessorCadastroDTO;
 import com.educamais.app.dtos.ProfessorResponseDTO;
+import com.educamais.app.dtos.TurmaResponseDTO;
 import com.educamais.app.model.Professor;
+import com.educamais.app.model.Turma;
 import com.educamais.app.services.ProfessorService;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -86,6 +91,15 @@ public class ProfessorController {
     }
     
     
+    @GetMapping("/minhas-turmas")
+    public ResponseEntity<List<TurmaResponseDTO>> getMinhasTurmas() {
+        List<Turma> turmas = professorService.getMinhasTurmas();
+        List<TurmaResponseDTO> dtos = turmas.stream()
+            .map(TurmaResponseDTO::new)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
+    }
     
 
 
