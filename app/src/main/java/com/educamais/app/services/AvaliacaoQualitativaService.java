@@ -2,9 +2,12 @@ package com.educamais.app.services;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.educamais.app.dtos.AvaliacaoCadastroDTO;
 import com.educamais.app.model.Aluno;
@@ -13,6 +16,7 @@ import com.educamais.app.model.Professor;
 import com.educamais.app.repository.AlunoRepository;
 import com.educamais.app.repository.AvaliacaoQualitativaRepository;
 import com.educamais.app.repository.ProfessorRepository;
+
 
 @Service
 public class AvaliacaoQualitativaService {
@@ -51,6 +55,13 @@ public class AvaliacaoQualitativaService {
         novaAvaliacao.setObservacao(data.observacao());
 
         return avaliacaoQualitativaRepository.save(novaAvaliacao);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AvaliacaoQualitativa> getHistoricoDoAluno(UUID alunoId){
+        if (!alunoRepository.existsById(alunoId)) throw new RuntimeException("Aluno não encontrado.");
+
+        return avaliacaoQualitativaRepository.findByAlunoIdOrderByDataAvaliacaoDesc(alunoId);
     }
 
 }

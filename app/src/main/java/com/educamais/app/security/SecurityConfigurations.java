@@ -59,6 +59,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.GET, "/alunos/{id}").hasAnyRole("ADMIN", "PROFESSOR");
                     req.requestMatchers(HttpMethod.GET, "/turmas").hasAnyRole("ADMIN", "PROFESSOR");
                     req.requestMatchers(HttpMethod.POST, "/avaliacoes").hasAnyRole("ADMIN", "PROFESSOR");
+                    req.requestMatchers(HttpMethod.GET, "/alunos/{alunoId}/avaliacoes").hasAnyRole("ADMIN", "PROFESSOR");
                     req.requestMatchers(HttpMethod.GET, "/professores/minhas-turmas").hasAnyRole("ADMIN", "PROFESSOR");
                     
                     req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
