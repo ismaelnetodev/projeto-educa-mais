@@ -5,6 +5,7 @@ public record AlunoCadastroDTO(
     String login,
     String password,
     String matricula,
+    String fotoUrl,
     Long turmaId
 ) {
 

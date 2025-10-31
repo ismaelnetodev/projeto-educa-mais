@@ -38,6 +38,7 @@ public class AlunoService {
         novoAluno.setMatricula(data.matricula());
         novoAluno.setRole(Roles.ALUNO);
         novoAluno.setEnabled(true);
+        novoAluno.setFotoUrl(data.fotoUrl());
         novoAluno.setTurma(turma);
 
         return alunoRepository.save(novoAluno);
