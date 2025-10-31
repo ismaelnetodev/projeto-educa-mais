@@ -76,11 +76,11 @@ public class DataSeeder implements CommandLineRunner {
             logger.info("Professor associado a turma existente");
 
             //Criar aluno e associar a turma
-            AlunoCadastroDTO aluno1DTO = new AlunoCadastroDTO("João Pedro", "joao.pedro", "1234", "002", turmaA.getId());
-            alunoService.criarAluno(aluno1DTO);
+            // AlunoCadastroDTO aluno1DTO = new AlunoCadastroDTO("João Pedro", "joao.pedro", "1234", "002", turmaA.getId());
+            // alunoService.criarAluno(aluno1DTO);
 
-            AlunoCadastroDTO aluno2DTO = new AlunoCadastroDTO("Mariana Stephany", "marii", "1234", "003", turmaA.getId());
-            alunoService.criarAluno(aluno2DTO);
+            // AlunoCadastroDTO aluno2DTO = new AlunoCadastroDTO("Mariana Stephany", "marii", "1234", "003", turmaA.getId());
+            // alunoService.criarAluno(aluno2DTO);
 
             logger.info("Alunos incluidos!");
             logger.info("Semeamento completo");
