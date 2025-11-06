@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.educamais.app.dtos.QuestaoCadastroDTO;
 import com.educamais.app.dtos.QuestaoResponseDTO;
@@ -23,9 +24,9 @@ public class QuestaoService {
         this.professorRepository = professorRepository;
     }
 
+    @Transactional
     public Questao criarQuestao(QuestaoCadastroDTO data){
-        String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        Professor professor = (Professor) professorRepository.findByLogin(login);
+        Professor professor = getProfessorLogado();
 
         if (professor == null) throw new RuntimeException("Professor não autenticado.");
 
@@ -40,46 +41,59 @@ public class QuestaoService {
         return this.questaoRepository.save(questao);
     }
 
+    @Transactional(readOnly = true)
     public List<Questao> getAllQuestoes(){
         List<Questao> questao = questaoRepository.findAll();
         return questao;
     }
 
-    public Questao getQuestao(Long id){
-        Optional<Questao> questao = questaoRepository.findById(id);
-
-        return questao.get();
-
+    @Transactional(readOnly = true)
+    public Questao getQuestao(Long id){     
+        return questaoRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     public Questao updateQuestao(QuestaoCadastroDTO data, Long id){
+        Professor professor = getProfessorLogado();
+
+        Questao questao = questaoRepository.findById(id).orElseThrow(() -> new RuntimeException("Questão não encontrada."));
+
+        if (!questao.getProfessorCriador().getId().equals(professor.getId())){
+            throw new RuntimeException("Acesso Negado: Você só pode editar suas próprias questões.");
+        }
+
+        questao.setDisciplina(data.disciplina());
+        questao.setAlternativas(data.alternativas());
+        questao.setRespostaCorreta(data.respostaCorreta());
+        questao.setEnunciado(data.enunciado());
+        questao.setTipo(data.tipo());
+
+        return this.questaoRepository.save(questao);
+    }
+
+    @Transactional
+    public boolean deleteQuestao(Long id){
+        Professor professor = getProfessorLogado();
+
+        Optional<Questao> questaoOpcional = questaoRepository.findById(id);
+        Questao questao = questaoOpcional.get();
+
+        if (!questao.getProfessorCriador().getId().equals(professor.getId())) {
+            throw new RuntimeException("Acesso Negado: Você só pode deletar suas próprias questões.");
+        }
+
+        questaoRepository.deleteById(id);
+        return false;
+    }
+
+    private Professor getProfessorLogado(){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         Professor professor = (Professor) professorRepository.findByLogin(login);
 
-        Optional<Questao> questao = questaoRepository.findById(id);
-
-        if (professor == null) throw new RuntimeException("Professor não autenticado.");
-        if (questao.isEmpty()) return null;
-
-        Questao questaoAtualizada = new Questao();
-        questaoAtualizada.setDisciplina(data.disciplina());
-        questaoAtualizada.setAlternativas(data.alternativas());
-        questaoAtualizada.setRespostaCorreta(data.respostaCorreta());
-        questaoAtualizada.setEnunciado(data.enunciado());
-        questaoAtualizada.setProfessorCriador(professor);
-        questaoAtualizada.setTipo(data.tipo());
-
-        return this.questaoRepository.save(questaoAtualizada);
-    }
-
-    public boolean deleteQuestao(Long id){
-        Optional<Questao> questao = questaoRepository.findById(id);
-
-        if (questao.isPresent()){
-            questaoRepository.deleteById(id);
-            return true;
+        if (professor == null){
+            throw new RuntimeException("Professor não autenticado");
         }
 
-        return false;
+        return professor;
     }
 }
