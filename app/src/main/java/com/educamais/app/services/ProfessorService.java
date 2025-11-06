@@ -69,13 +69,13 @@ public class ProfessorService {
     }
 
     // Deletar professor
-    public Professor deleteProfessor(UUID id) {
+    public boolean deleteProfessor(UUID id) {
         Optional<Professor> professor = professorRepository.findById(id);
         if (professor.isPresent()) {
             professorRepository.deleteById(id);
-            return professor.get();
+            return true;
         }
-        return null;
+        return false;
     }
 
     @Transactional(readOnly = true)

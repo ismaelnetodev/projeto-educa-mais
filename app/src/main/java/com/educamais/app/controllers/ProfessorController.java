@@ -83,11 +83,11 @@ public class ProfessorController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> detelarProfessor(@PathVariable UUID id) {
-        Professor professor = professorService.deleteProfessor(id);
-        if (professor == null) {
-            return ResponseEntity.notFound().build();
+        boolean professorDeletado = professorService.deleteProfessor(id);
+        if (professorDeletado) {
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
     
     
