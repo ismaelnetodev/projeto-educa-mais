@@ -156,3 +156,5 @@ replay_pid*
 .history
 .ionide
 /.vscode
+app/src/main/resources/application-local.properties
+app/src/main/resources/META-INF/additional-spring-configuration-metadata.json

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.educamais.app.dtos.QuestaoCadastroDTO;
-import com.educamais.app.dtos.QuestaoResponseDTO;
 import com.educamais.app.model.Professor;
 import com.educamais.app.model.Questao;
 import com.educamais.app.repository.ProfessorRepository;
@@ -84,6 +83,24 @@ public class QuestaoService {
 
         questaoRepository.deleteById(id);
         return false;
+    }
+
+    @Transactional
+    public Questao clonarQuestao(Long idQuestaoOriginal){
+        Professor professorClonando = getProfessorLogado();
+
+        Questao questaoOriginal = questaoRepository.findById(idQuestaoOriginal).orElseThrow(() -> new RuntimeException("Questão não encontrada"));
+
+        Questao novaQuestao = new Questao();
+
+        novaQuestao.setEnunciado(questaoOriginal.getEnunciado());
+        novaQuestao.setDisciplina(questaoOriginal.getDisciplina());
+        novaQuestao.setAlternativas(questaoOriginal.getAlternativas());
+        novaQuestao.setRespostaCorreta(questaoOriginal.getRespostaCorreta());
+        novaQuestao.setTipo(questaoOriginal.getTipo());
+
+        novaQuestao.setProfessorCriador(professorClonando);
+        return questaoRepository.save(novaQuestao);
     }
 
     private Professor getProfessorLogado(){

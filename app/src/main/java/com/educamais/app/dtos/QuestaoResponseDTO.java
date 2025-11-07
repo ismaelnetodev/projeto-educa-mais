@@ -2,13 +2,15 @@ package com.educamais.app.dtos;
 
 import java.util.List;
 
+import com.educamais.app.enums.TipoQuestao;
 import com.educamais.app.model.Questao;
 
 public record QuestaoResponseDTO(
     Long id,
     String enunciado,
     String disciplina,
-    String tipo,
+    TipoQuestao tipo,
+    double pontuacao,
     List<String> alternativas,
     String respostaCorreta,
     String nomeProfessor
@@ -20,6 +22,7 @@ public record QuestaoResponseDTO(
             questao.getEnunciado(),
             questao.getDisciplina(),
             questao.getTipo(),
+            questao.getPontuacao(),
             questao.getAlternativas(),
             questao.getRespostaCorreta(),
             questao.getProfessorCriador().getNome()

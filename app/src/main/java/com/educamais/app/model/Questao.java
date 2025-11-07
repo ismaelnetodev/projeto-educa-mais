@@ -2,9 +2,13 @@ package com.educamais.app.model;
 
 import java.util.List;
 
+import com.educamais.app.enums.TipoQuestao;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,11 +28,16 @@ public class Questao {
     @Lob
     @Column(nullable = false)
     private String enunciado;
-
+    
+    private String imagemUrl;
     private String disciplina;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String tipo;
+    private TipoQuestao tipo;
+
+    @Column(nullable = false)
+    private double pontuacao = 1.0;
 
     @ElementCollection
     private List<String> alternativas;
@@ -56,6 +65,22 @@ public class Questao {
         this.enunciado = enunciado;
     }
 
+    public String getImagemUrl(){
+        return imagemUrl;
+    }
+
+    public void setImagemUrl(String imagemUrl){
+        this.imagemUrl = imagemUrl;
+    }
+
+    public double getPontuacao(){
+        return pontuacao;
+    }
+
+    public void setPontuacao(double pontuacao){
+        this.pontuacao = pontuacao;
+    }
+
     public String getDisciplina() {
         return disciplina;
     }
@@ -64,11 +89,11 @@ public class Questao {
         this.disciplina = disciplina;
     }
 
-    public String getTipo() {
+    public TipoQuestao getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoQuestao tipo) {
         this.tipo = tipo;
     }
 

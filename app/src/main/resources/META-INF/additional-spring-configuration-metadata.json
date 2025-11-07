@@ -8,5 +8,50 @@
     "name": "api.security.admin.password",
     "type": "java.lang.String",
     "description": "A description for 'api.security.admin.password'"
+  },
+  {
+    "name": "JWT_SECRET",
+    "type": "java.lang.String",
+    "description": "A description for 'JWT_SECRET'"
+  },
+  {
+    "name": "AWS_ACCESS_KEY_ID",
+    "type": "java.lang.String",
+    "description": "A description for 'AWS_ACCESS_KEY_ID'"
+  },
+  {
+    "name": "DB_PASSWORD",
+    "type": "java.lang.String",
+    "description": "A description for 'DB_PASSWORD'"
+  },
+  {
+    "name": "AWS_REGION",
+    "type": "java.lang.String",
+    "description": "A description for 'AWS_REGION'"
+  },
+  {
+    "name": "AWS_REGION",
+    "type": "java.lang.String",
+    "description": "A description for 'AWS_REGION'"
+  },
+  {
+    "name": "AWS_REGION",
+    "type": "java.lang.String",
+    "description": "A description for 'AWS_REGION'"
+  },
+  {
+    "name": "AWS_REGION",
+    "type": "java.lang.String",
+    "description": "A description for 'AWS_REGION'"
+  },
+  {
+    "name": "AWS_BUCKET_NAME",
+    "type": "java.lang.String",
+    "description": "A description for 'AWS_BUCKET_NAME'"
+  },
+  {
+    "name": "AWS_SECRET_ACCESS_KEY",
+    "type": "java.lang.String",
+    "description": "A description for 'AWS_SECRET_ACCESS_KEY'"
   }
 ]}
