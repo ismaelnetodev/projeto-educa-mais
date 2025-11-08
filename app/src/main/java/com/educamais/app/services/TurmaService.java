@@ -70,6 +70,7 @@ public class TurmaService {
         return null;
     }
 
+    @Transactional
     public Turma associarProfessor(Long turmaId, UUID professorId){
         Turma turma = turmaRepository.findById(turmaId).orElseThrow(() -> new RuntimeException("Turma não encontrada"));
 

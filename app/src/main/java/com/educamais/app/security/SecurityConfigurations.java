@@ -63,6 +63,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.GET, "/professores/minhas-turmas").hasAnyRole("ADMIN", "PROFESSOR");
                     
                     req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/upload/photo").authenticated();
                     req.anyRequest().authenticated();
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
