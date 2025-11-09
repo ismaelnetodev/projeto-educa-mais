@@ -61,7 +61,12 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/avaliacoes").hasAnyRole("ADMIN", "PROFESSOR");
                     req.requestMatchers(HttpMethod.GET, "/alunos/{alunoId}/avaliacoes").hasAnyRole("ADMIN", "PROFESSOR");
                     req.requestMatchers(HttpMethod.GET, "/professores/minhas-turmas").hasAnyRole("ADMIN", "PROFESSOR");
+                    req.requestMatchers(HttpMethod.GET, "/simulados/professor/meus-simulados").hasAnyRole("ADMIN", "PROFESSOR");
                     
+                    //ALUNO
+                    req.requestMatchers(HttpMethod.GET, "/simulados/aluno/minhas-provas").hasRole("ALUNO");
+                    req.requestMatchers(HttpMethod.POST, "/simulados/{simuladoId}/submeter").hasRole("ALUNO");
+
                     req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/upload/photo").authenticated();
                     req.anyRequest().authenticated();
