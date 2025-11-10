@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -114,6 +116,18 @@ public class AlunoController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<List<AlunoResponseDTO>> buscarAluno(@RequestParam("termo") String termo) {
+        List<Aluno> alunos = alunoService.buscarAlunos(termo);
+        
+        List<AlunoResponseDTO> dtos = alunos.stream()
+            .map(AlunoResponseDTO::new)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
+    }
+    
     
 
 }

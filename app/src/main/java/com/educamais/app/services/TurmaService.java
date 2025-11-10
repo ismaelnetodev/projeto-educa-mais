@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.educamais.app.dtos.TurmaCadastroDTO;
@@ -87,6 +89,12 @@ public class TurmaService {
     public List<Aluno> getAlunosPorTurma(Long turmaId){
         Turma turma = turmaRepository.findById(turmaId).orElseThrow(() -> new RuntimeException("Turma não encontrada"));
         return turma.getAlunos();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Turma> buscarTurmas(String termoBusca){
+        Pageable limite = PageRequest.of(0, 10);
+        return turmaRepository.buscaRapidaPorNome(termoBusca, limite);
     }
 
 }

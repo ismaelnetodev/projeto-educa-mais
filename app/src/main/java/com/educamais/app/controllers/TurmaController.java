@@ -120,6 +120,16 @@ public class TurmaController {
         }
     }
     
+    @GetMapping("/buscar")
+    public ResponseEntity<List<TurmaResponseDTO>> buscarTurma(@RequestParam("termo") String termo) {
+        List<Turma> turma = turmaService.buscarTurmas(termo);
+
+        List<TurmaResponseDTO> dtos = turma.stream()
+            .map(TurmaResponseDTO::new)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
+    }
     
 
 }
