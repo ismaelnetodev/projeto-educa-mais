@@ -24,12 +24,14 @@ import com.educamais.app.dtos.SimuladoResponseDTO;
 import com.educamais.app.dtos.SimuladoResumoDTO;
 import com.educamais.app.dtos.SimuladoSubmeterDTO;
 import com.educamais.app.model.Aluno;
+import com.educamais.app.model.Disciplina;
 import com.educamais.app.model.Professor;
 import com.educamais.app.model.Questao;
 import com.educamais.app.model.Simulado;
 import com.educamais.app.model.SimuladoAluno;
 import com.educamais.app.model.Turma;
 import com.educamais.app.repository.AlunoRepository;
+import com.educamais.app.repository.DisciplinaRepository;
 import com.educamais.app.repository.ProfessorRepository;
 import com.educamais.app.repository.QuestaoRepository;
 import com.educamais.app.repository.SimuladoAlunoRepository;
@@ -44,19 +46,22 @@ public class SimuladoService {
     private final ProfessorRepository professorRepository;
     private final AlunoRepository alunoRepository;
     private final TurmaRepository turmaRepository;
+    private final DisciplinaRepository disciplinaRepository;
 
     public SimuladoService(SimuladoRepository simuladoRepository,
                            SimuladoAlunoRepository simuladoAlunoRepository,
                            QuestaoRepository questaoRepository,
                            ProfessorRepository professorRepository,
                            AlunoRepository alunoRepository,
-                           TurmaRepository turmaRepository) {
+                           TurmaRepository turmaRepository,
+                           DisciplinaRepository disciplinaRepository) {
         this.simuladoRepository = simuladoRepository;
         this.simuladoAlunoRepository = simuladoAlunoRepository;
         this.questaoRepository = questaoRepository;
         this.professorRepository = professorRepository;
         this.alunoRepository = alunoRepository;
         this.turmaRepository = turmaRepository;
+        this.disciplinaRepository = disciplinaRepository;
     }
 
     @Transactional
@@ -68,7 +73,11 @@ public class SimuladoService {
         Turma turma = turmaRepository.findById(data.turmaId())
             .orElseThrow(() -> new RuntimeException("Turma não encontrada."));
 
-        List<Questao> bancoDeQuestoes = questaoRepository.findbyDisciplinaAndProfessorId(data.disciplinaId(), professor.getId());
+        Disciplina disciplina = disciplinaRepository.findById(data.disciplinaId())
+        .orElseThrow(() -> new RuntimeException("Disciplina não encontrada."));
+
+        List<Questao> bancoDeQuestoes = questaoRepository
+            .findByDisciplinaAndProfessorCriador(disciplina, professor);
 
         if (bancoDeQuestoes.size() < data.numeroQuestoes()){
             throw new RuntimeException("Não há questões suficientes para esta disciplina.");
