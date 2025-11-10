@@ -1,12 +1,9 @@
 package com.educamais.app.services;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.educamais.app.dtos.RespostaSimuladoDTO;
 import com.educamais.app.dtos.SimuladoAlunoResponseDTO;
 import com.educamais.app.dtos.SimuladoGerarDTO;
+import com.educamais.app.dtos.SimuladoParaFazerDTO;
 import com.educamais.app.dtos.SimuladoResponseDTO;
 import com.educamais.app.dtos.SimuladoSubmeterDTO;
 import com.educamais.app.model.Aluno;
@@ -99,13 +97,13 @@ public class SimuladoService {
     }
 
     @Transactional(readOnly = true)
-    public SimuladoResponseDTO getSimuladoParaFazer(Long simuladoId) {
+    public SimuladoParaFazerDTO getSimuladoParaFazer(Long simuladoId) {
         Simulado simulado = simuladoRepository.findById(simuladoId)
             .orElseThrow(() -> new RuntimeException("Simulado não encontrado."));
         
         // (Lógica de segurança futura: verificar se o aluno é da turma)
         
-        return new SimuladoResponseDTO(simulado);
+        return new SimuladoParaFazerDTO(simulado);
     }
 
     @Transactional

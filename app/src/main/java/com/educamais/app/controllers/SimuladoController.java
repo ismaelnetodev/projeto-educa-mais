@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.educamais.app.dtos.SimuladoAlunoResponseDTO;
 import com.educamais.app.dtos.SimuladoGerarDTO;
+import com.educamais.app.dtos.SimuladoParaFazerDTO;
 import com.educamais.app.dtos.SimuladoResponseDTO;
 import com.educamais.app.dtos.SimuladoSubmeterDTO;
 import com.educamais.app.model.Simulado;
@@ -50,9 +51,9 @@ public class SimuladoController {
     }
 
     @GetMapping("/{simuladoId}/fazer")
-    public ResponseEntity<SimuladoResponseDTO> getSimuladoParaFazer(@PathVariable Long simuladoId) {
+    public ResponseEntity<SimuladoParaFazerDTO> getSimuladoParaFazer(@PathVariable Long simuladoId) {
         try {
-            SimuladoResponseDTO dto = simuladoService.getSimuladoParaFazer(simuladoId);
+            SimuladoParaFazerDTO dto = simuladoService.getSimuladoParaFazer(simuladoId);
             return ResponseEntity.ok(dto);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
