@@ -7,20 +7,25 @@ import com.educamais.app.dtos.SimuladoAlunoResponseDTO;
 import com.educamais.app.dtos.SimuladoGerarDTO;
 import com.educamais.app.dtos.SimuladoParaFazerDTO;
 import com.educamais.app.dtos.SimuladoResponseDTO;
+import com.educamais.app.dtos.SimuladoResumoDTO;
 import com.educamais.app.dtos.SimuladoSubmeterDTO;
-import com.educamais.app.model.Simulado;
 import com.educamais.app.services.SimuladoService;
 
+import io.micrometer.core.ipc.http.HttpSender.Response;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -44,7 +49,7 @@ public class SimuladoController {
         }
     }
 
-    @GetMapping("/aluno/minhas-provas")
+    @GetMapping("/disponiveis")
     public ResponseEntity<List<SimuladoResponseDTO>> getSimuladoParaAluno() {
         List<SimuladoResponseDTO> dtos = simuladoService.getSimuladoParaAluno();
         return ResponseEntity.ok(dtos);
@@ -79,13 +84,31 @@ public class SimuladoController {
 
 
     @GetMapping("/{simuladoId}/resultados")
-    public ResponseEntity<?> getResultadoDoSimulado(@PathVariable Long simuladoId) {
+    public ResponseEntity<?> getResultadoDoSimulado(
+        @PathVariable Long simuladoId,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<SimuladoAlunoResponseDTO> resultados = simuladoService.getResultadosDoSimulado(simuladoId, pageable);
+        return ResponseEntity.ok(resultados);
+    }
+
+    @GetMapping("/{simuladoId}/resumo")
+    public ResponseEntity<?> getResumoSimulado(@PathVariable Long simuladoId) {
         try{
-            List<SimuladoAlunoResponseDTO> dtos = simuladoService.getResultadosDoSimulado(simuladoId);
-            return ResponseEntity.ok(dtos);
+            SimuladoResumoDTO resumo = simuladoService.getResumoDoSimulado(simuladoId);
+            return ResponseEntity.ok(resumo);
         } catch (RuntimeException e){
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
     }
+    
+    @GetMapping("/{simuladoId}/alunos")
+    public Page<SimuladoAlunoResponseDTO> getAlunosDoSimulado(@PathVariable Long simuladoId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return simuladoService.getAlunosDoSimulado(simuladoId, pageable);
+    }
+    
 
 }

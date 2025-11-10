@@ -1,10 +1,14 @@
 package com.educamais.app.dtos;
 
+import java.time.LocalDateTime;
+
 public record SimuladoGerarDTO(
     String titulo,
     Long turmaId,
-    String disciplina,
-    int numeroQuestoes
+    Long disciplinaId,
+    int numeroQuestoes,
+    LocalDateTime inicioDisponivel,
+    LocalDateTime fimDisponivel
 ) {
 
 }

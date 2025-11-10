@@ -16,7 +16,7 @@ public record QuestaoAlunoDTO(
 ) {
 
     public QuestaoAlunoDTO(Questao questao){
-        this(questao.getId(), questao.getEnunciado(), questao.getImagemUrl(), questao.getDisciplina(), questao.getTipo(), questao.getPontuacao(), questao.getAlternativas());
+        this(questao.getId(), questao.getEnunciado(), questao.getImagemUrl(), questao.getDisciplina().getNome(), questao.getTipo(), questao.getPontuacao(), questao.getAlternativas());
     }
 
 }

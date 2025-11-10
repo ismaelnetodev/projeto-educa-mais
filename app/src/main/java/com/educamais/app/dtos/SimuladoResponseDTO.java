@@ -12,16 +12,20 @@ public record SimuladoResponseDTO(
     String nomeProfessor,
     String nomeTurma,
     LocalDateTime dataCriacao,
+    LocalDateTime dataInicioDisponivel,
+    LocalDateTime dataFimDisponivel,
     List<QuestaoResponseDTO> questoes
 ) {
 
     public SimuladoResponseDTO(Simulado simulado){
         this(
-            simulado.getId(), 
-            simulado.getTitulo(), 
-            simulado.getProfessor().getNome(), 
-            simulado.getTurma().getNome(), 
-            simulado.getDataCriacao(), 
+            simulado.getId(),
+            simulado.getTitulo(),
+            simulado.getProfessor().getNome(),
+            simulado.getTurma().getNome(),
+            simulado.getDataCriacao(),
+            simulado.getDataInicioDisponivel(),
+            simulado.getDataFimDisponivel(),
             simulado.getQuestoes()
                 .stream()
                 .map(QuestaoResponseDTO::new)

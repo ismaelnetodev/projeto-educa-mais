@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.educamais.app.dtos.QuestaoCadastroDTO;
+import com.educamais.app.model.Disciplina;
 import com.educamais.app.model.Professor;
 import com.educamais.app.model.Questao;
+import com.educamais.app.repository.DisciplinaRepository;
 import com.educamais.app.repository.ProfessorRepository;
 import com.educamais.app.repository.QuestaoRepository;
 
@@ -17,10 +19,12 @@ import com.educamais.app.repository.QuestaoRepository;
 public class QuestaoService {
     private final QuestaoRepository questaoRepository;
     private final ProfessorRepository professorRepository;
+    private final DisciplinaRepository disciplinaRepository;
 
-    public QuestaoService(QuestaoRepository questaoRepository, ProfessorRepository professorRepository){
+    public QuestaoService(QuestaoRepository questaoRepository, ProfessorRepository professorRepository, DisciplinaRepository disciplinaRepository){
         this.questaoRepository = questaoRepository;
         this.professorRepository = professorRepository;
+        this.disciplinaRepository = disciplinaRepository;
     }
 
     @Transactional
@@ -29,8 +33,10 @@ public class QuestaoService {
 
         if (professor == null) throw new RuntimeException("Professor não autenticado.");
 
+        Disciplina disciplina = resolveDisciplina(data.disciplina());
+
         Questao questao = new Questao();
-        questao.setDisciplina(data.disciplina());
+        questao.setDisciplina(disciplina);
         questao.setAlternativas(data.alternativas());
         questao.setRespostaCorreta(data.respostaCorreta());
         questao.setEnunciado(data.enunciado());
@@ -61,7 +67,9 @@ public class QuestaoService {
             throw new RuntimeException("Acesso Negado: Você só pode editar suas próprias questões.");
         }
 
-        questao.setDisciplina(data.disciplina());
+        Disciplina disciplina = resolveDisciplina(data.disciplina());
+
+        questao.setDisciplina(disciplina);
         questao.setAlternativas(data.alternativas());
         questao.setRespostaCorreta(data.respostaCorreta());
         questao.setEnunciado(data.enunciado());
@@ -112,5 +120,18 @@ public class QuestaoService {
         }
 
         return professor;
+    }
+
+    private Disciplina resolveDisciplina(String nomeDisciplina){
+        if (nomeDisciplina == null || nomeDisciplina.trim().isEmpty()){
+            throw new RuntimeException("Nome da disciplina é obrigatório.");
+        }
+
+        return disciplinaRepository.findByNomeIgnoreCase(nomeDisciplina.trim())
+            .orElseGet(() -> {
+                Disciplina nova = new Disciplina();
+                nova.setNome(Character.toUpperCase(nomeDisciplina.trim().charAt(0)) + nomeDisciplina.trim().substring(1).toLowerCase());
+                return disciplinaRepository.save(nova);
+            });
     }
 }

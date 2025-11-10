@@ -2,8 +2,6 @@ package com.educamais.app.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +22,8 @@ public class Simulado {
 
     private String titulo;
     private LocalDateTime dataCriacao;
+    private LocalDateTime dataInicioDisponivel;
+    private LocalDateTime dataFimDisponivel;
 
     @ManyToOne
     @JoinColumn(name = "professor_id", nullable = false)
@@ -41,6 +41,9 @@ public class Simulado {
     )
     private List<Questao> questoes;
 
+    @ManyToOne
+    @JoinColumn(name = "disciplina_id", nullable = false)
+    private Disciplina disciplina;
 
     public Long getId() {
         return id;
@@ -66,6 +69,22 @@ public class Simulado {
         this.dataCriacao = dataCriacao;
     }
 
+    public LocalDateTime getDataInicioDisponivel() {
+        return dataInicioDisponivel;
+    }
+
+    public void setDataInicioDisponivel(LocalDateTime dataInicioDisponivel) {
+        this.dataInicioDisponivel = dataInicioDisponivel;
+    }
+
+    public LocalDateTime getDataFimDisponivel() {
+        return dataFimDisponivel;
+    }
+
+    public void setDataFimDisponivel(LocalDateTime dataFimDisponivel) {
+        this.dataFimDisponivel = dataFimDisponivel;
+    }
+
     public Professor getProfessor() {
         return professor;
     }
@@ -88,6 +107,14 @@ public class Simulado {
 
     public void setQuestoes(List<Questao> questoes) {
         this.questoes = questoes;
+    }
+
+    public Disciplina getDisciplina(){
+        return disciplina;
+    }
+
+    public void setDisciplina(Disciplina disciplina){
+        this.disciplina = disciplina;
     }
 
 }

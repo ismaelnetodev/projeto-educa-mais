@@ -30,7 +30,10 @@ public class Questao {
     private String enunciado;
     
     private String imagemUrl;
-    private String disciplina;
+
+    @ManyToOne
+    @JoinColumn(name = "disciplina_id")
+    private Disciplina disciplina;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -81,11 +84,11 @@ public class Questao {
         this.pontuacao = pontuacao;
     }
 
-    public String getDisciplina() {
+    public Disciplina getDisciplina() {
         return disciplina;
     }
 
-    public void setDisciplina(String disciplina) {
+    public void setDisciplina(Disciplina disciplina) {
         this.disciplina = disciplina;
     }
 

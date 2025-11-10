@@ -1,20 +1,27 @@
 package com.educamais.app.services;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.educamais.app.dtos.QuestaoResponseDTO;
+import com.educamais.app.dtos.QuestaoResumoDTO;
 import com.educamais.app.dtos.RespostaSimuladoDTO;
 import com.educamais.app.dtos.SimuladoAlunoResponseDTO;
 import com.educamais.app.dtos.SimuladoGerarDTO;
 import com.educamais.app.dtos.SimuladoParaFazerDTO;
 import com.educamais.app.dtos.SimuladoResponseDTO;
+import com.educamais.app.dtos.SimuladoResumoDTO;
 import com.educamais.app.dtos.SimuladoSubmeterDTO;
 import com.educamais.app.model.Aluno;
 import com.educamais.app.model.Professor;
@@ -61,10 +68,10 @@ public class SimuladoService {
         Turma turma = turmaRepository.findById(data.turmaId())
             .orElseThrow(() -> new RuntimeException("Turma não encontrada."));
 
-        List<Questao> bancoDeQuestoes = questaoRepository.findByDisciplina(data.disciplina());
+        List<Questao> bancoDeQuestoes = questaoRepository.findbyDisciplinaAndProfessorId(data.disciplinaId(), professor.getId());
 
         if (bancoDeQuestoes.size() < data.numeroQuestoes()){
-            throw new RuntimeException("Não há questões suficientes de " + data.disciplina() + " pra gerar o simulado.");
+            throw new RuntimeException("Não há questões suficientes para esta disciplina.");
         }
 
         Collections.shuffle(bancoDeQuestoes);
@@ -76,6 +83,9 @@ public class SimuladoService {
         novoSimulado.setProfessor(professor);
         novoSimulado.setTurma(turma);
         novoSimulado.setQuestoes(questoesSelecionadas);
+        novoSimulado.setDisciplina(questoesSelecionadas.get(0).getDisciplina());
+        novoSimulado.setDataInicioDisponivel(data.inicioDisponivel());
+        novoSimulado.setDataFimDisponivel(data.fimDisponivel());
 
         Simulado simuladoSalvo = simuladoRepository.save(novoSimulado);
 
@@ -91,7 +101,18 @@ public class SimuladoService {
 
         List<Simulado> simulados = simuladoRepository.findByTurmaId(aluno.getTurma().getId());
 
-        return simulados.stream()
+        LocalDateTime agora = LocalDateTime.now();
+
+        List<Simulado> simuladosDisponiveis = simulados.stream()
+            .filter(s -> 
+                s.getDataInicioDisponivel() != null && 
+                s.getDataFimDisponivel() != null &&
+                s.getDataInicioDisponivel().isBefore(agora) && 
+                s.getDataFimDisponivel().isAfter(agora)
+            )
+            .collect(Collectors.toList());
+
+        return simuladosDisponiveis.stream()
                 .map(SimuladoResponseDTO::new)
                 .collect(Collectors.toList());
     }
@@ -113,6 +134,16 @@ public class SimuladoService {
         if (aluno == null) throw new RuntimeException("Aluno não autenticado.");
 
         Simulado simulado = simuladoRepository.findById(simuladoId).orElseThrow(() -> new RuntimeException("Nenhum simulado encontrado."));
+
+        LocalDateTime agora = LocalDateTime.now();
+
+        if (agora.isBefore(simulado.getDataInicioDisponivel())){
+            throw new RuntimeException("O simulado ainda não está disponível");
+        }
+
+        if (agora.isAfter(simulado.getDataFimDisponivel())){
+            throw new RuntimeException("O prazo para este simulado expirou");
+        }
 
         boolean jaSubmeteu = simuladoAlunoRepository.existsByAlunoIdAndSimuladoId(aluno.getId(), simuladoId);
 
@@ -163,13 +194,117 @@ public class SimuladoService {
     }
 
     @Transactional(readOnly = true)
-    public List<SimuladoAlunoResponseDTO> getResultadosDoSimulado(Long simuladoId){
+    public Page<SimuladoAlunoResponseDTO> getResultadosDoSimulado(Long simuladoId, Pageable pageable){
         if (!simuladoRepository.existsById(simuladoId)) throw new RuntimeException("Simulado não encontrado");
+
+        Page<SimuladoAluno> resultados = simuladoAlunoRepository.findBySimuladoId(simuladoId, pageable);
+
+        return resultados.map(SimuladoAlunoResponseDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public SimuladoResumoDTO getResumoDoSimulado(Long simuladoId){
+        Simulado simulado = simuladoRepository.findById(simuladoId).orElseThrow(() -> new RuntimeException("Simulado não encontrado"));
+
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Professor professor = (Professor) professorRepository.findByLogin(login);
+
+        if (professor == null) throw new RuntimeException("Professor não autenticado");
+        if (!simulado.getProfessor().getId().equals(professor.getId())){
+            throw new RuntimeException("Apenas o professor criador do simulado pode ver o resumo.");
+        }
 
         List<SimuladoAluno> resultados = simuladoAlunoRepository.findBySimuladoId(simuladoId);
 
-        return resultados.stream()
-                .map(SimuladoAlunoResponseDTO::new)
-                .collect(Collectors.toList());
+        int totalAlunos = 0;
+        if (simulado.getTurma() != null && simulado.getTurma().getAlunos() != null){
+            totalAlunos = simulado.getTurma().getAlunos().size();
+        }
+
+        int alunosQueResponderam = resultados.size();
+
+        double mediaNotas = 0.0;
+        double maiorNota = 0.0;
+        double menorNota = 0.0;
+
+        if(!resultados.isEmpty()){
+            mediaNotas = resultados.stream().mapToDouble(SimuladoAluno::getNotaFinal).average().orElse(0.0);
+            maiorNota = resultados.stream().mapToDouble(SimuladoAluno::getNotaFinal).max().orElse(0.0);
+            menorNota = resultados.stream().mapToDouble(SimuladoAluno::getNotaFinal).min().orElse(0.0);
+        }
+
+        double taxaParticipacaoPercent = totalAlunos == 0 ? 0.0 : (alunosQueResponderam * 100.0 / totalAlunos);
+
+        Map<Long, Questao> questoesPorId = simulado.getQuestoes().stream()
+            .collect(Collectors.toMap(q -> q.getId(), q -> q));
+
+        Map<Long, Integer> totalRespondentesPorQuestao = new HashMap<>();
+        Map<Long, Integer> totalAcertosPorQuestao = new HashMap<>();
+
+        for (SimuladoAluno sa : resultados){
+            Map<Long, String> respostas = sa.getRespostas();
+            if (respostas == null) continue;
+            for (Map.Entry<Long, String> entry : respostas.entrySet()){
+                Long questaoId = entry.getKey();
+                String respostaDada = entry.getValue();
+
+                totalRespondentesPorQuestao.put(questaoId, totalRespondentesPorQuestao.getOrDefault(questaoId, 0) + 1);
+
+                Questao q = questoesPorId.get(questaoId);
+                if (q != null && respostaDada != null){
+                    String correta = q.getRespostaCorreta();
+                    if (correta != null && respostaDada.trim().equalsIgnoreCase(correta.trim())){
+                        totalAcertosPorQuestao.put(questaoId, totalAcertosPorQuestao.getOrDefault(questaoId, 0) + 1);
+                    }
+                }
+            }
+        }
+
+        List<QuestaoResumoDTO> questaoResumoList = new ArrayList<>();
+        for (Questao q : simulado.getQuestoes()) {
+            Long qid = q.getId();
+            int responded = totalRespondentesPorQuestao.getOrDefault(qid, 0);
+            int correct = totalAcertosPorQuestao.getOrDefault(qid, 0);
+            double taxa = responded == 0 ? 0.0 : (correct * 100.0 / responded);
+
+            String enunciado = q.getEnunciado();
+            String enunciadoResumo = enunciado == null ? "" :
+                (enunciado.length() > 120 ? enunciado.substring(0, 120) + "..." : enunciado);
+
+            questaoResumoList.add(new QuestaoResumoDTO(qid, enunciadoResumo, responded, correct, taxa));
+        }
+
+        return new SimuladoResumoDTO(
+            simulado.getId(),
+            simulado.getTitulo(),
+            totalAlunos,
+            alunosQueResponderam,
+            round(mediaNotas),
+            round(maiorNota),
+            round(menorNota),
+            round(taxaParticipacaoPercent),
+            questaoResumoList
+        );
+
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SimuladoAlunoResponseDTO> getAlunosDoSimulado(Long simuladoId, Pageable pageable){
+        Simulado simulado = simuladoRepository.findById(simuladoId).orElseThrow(() -> new RuntimeException("Simulado não encontrado."));
+
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Professor professor = (Professor) professorRepository.findByLogin(login);
+
+        if(professor == null) throw new RuntimeException("Professor não autenticado");
+        if (!simulado.getProfessor().getId().equals(professor.getId())){
+            throw new RuntimeException("Apenas o professor criador pode ver as submissões.");
+        }
+
+        Page<SimuladoAluno> page = simuladoAlunoRepository.findBySimuladoId(simuladoId, pageable);
+        return page.map(SimuladoAlunoResponseDTO::new);
+    }
+
+    private double round(double value) {
+        return Math.round(value * 100.0) / 100.0;
     }
 }

@@ -20,7 +20,7 @@ public record QuestaoResponseDTO(
         this(
             questao.getId(),
             questao.getEnunciado(),
-            questao.getDisciplina(),
+            questao.getDisciplina() != null ? questao.getDisciplina().getNome() : null,
             questao.getTipo(),
             questao.getPontuacao(),
             questao.getAlternativas(),
