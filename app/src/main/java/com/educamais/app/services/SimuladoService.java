@@ -104,9 +104,8 @@ public class SimuladoService {
 
     @Transactional(readOnly = true)
     public List<SimuladoResponseDTO> getSimuladoParaAluno(){
-        String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        Aluno aluno = (Aluno) alunoRepository.findByLogin(login);
-        if (aluno == null) throw new RuntimeException("Aluno não autenticado.");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Aluno aluno = alunoRepository.findByMatricula(username).orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
         List<Simulado> simulados = simuladoRepository.findByTurmaId(aluno.getTurma().getId());
 
@@ -138,9 +137,8 @@ public class SimuladoService {
 
     @Transactional
     public SimuladoAlunoResponseDTO submeterSimulado(Long simuladoId, SimuladoSubmeterDTO data){
-        String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        Aluno aluno = (Aluno) alunoRepository.findByLogin(login);
-        if (aluno == null) throw new RuntimeException("Aluno não autenticado.");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Aluno aluno = alunoRepository.findByMatricula(username).orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
         Simulado simulado = simuladoRepository.findById(simuladoId).orElseThrow(() -> new RuntimeException("Nenhum simulado encontrado."));
 

@@ -17,6 +17,9 @@ public class Aluno extends User{
     @JoinColumn(name = "turma_id")
     private Turma turma;
 
+    @Column(nullable = false)
+    private boolean senhaTemporaria = true;
+
     public Aluno(){
         super();
     }
@@ -24,6 +27,7 @@ public class Aluno extends User{
     public Aluno(String matricula, Turma turma){
         this.matricula = matricula;
         this.turma = turma;
+        super.setLogin(matricula);
     }
 
     public String getMatricula(){
@@ -40,5 +44,13 @@ public class Aluno extends User{
 
     public void setTurma(Turma turma){
         this.turma = turma;
+    }
+
+    public boolean isSenhaTemporaria(){
+        return senhaTemporaria;
+    }
+
+    public void setSenhaTemporaria(boolean senhaTemporaria){
+        this.senhaTemporaria = senhaTemporaria;
     }
 }

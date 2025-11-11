@@ -30,10 +30,8 @@ public class PerfilService {
 
     @Transactional(readOnly = true)
     public AlunoPerfilDTO getMeuPerfil(){
-        String login = SecurityContextHolder.getContext().getAuthentication().getName();
-        Aluno aluno = (Aluno) alunoRepository.findByLogin(login);
-        
-        if (aluno == null) throw new RuntimeException("Aluno não autenticado");
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Aluno aluno = alunoRepository.findByMatricula(username).orElseThrow(() -> new RuntimeException("Aluno não encontrado."));
 
         UUID alunoId = aluno.getId();
 

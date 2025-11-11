@@ -33,57 +33,46 @@ public class AlunoService {
     public Aluno criarAluno(AlunoCadastroDTO data){
         Turma turma = turmaRepository.findById(data.turmaId()).orElseThrow(() -> new RuntimeException("Turma não encontrada com o id: " + data.turmaId()));
 
-        String senhaCriptografada = passwordEncoder.encode(data.password());
+        if (alunoRepository.findByMatricula(data.matricula()).isPresent()){
+            throw new RuntimeException("Já existe um aluno com a matrícula: " + data.matricula());
+        }
+
+        String senhaGerada = "A@" + data.matricula().substring(Math.max(0, data.matricula().length() - 4));
+
         Aluno novoAluno = new Aluno();
         novoAluno.setNome(data.nome());
-        novoAluno.setLogin(data.login());
-        novoAluno.setPassword(senhaCriptografada);
+        novoAluno.setLogin(data.matricula());
+        novoAluno.setPassword(passwordEncoder.encode(senhaGerada));
         novoAluno.setMatricula(data.matricula());
         novoAluno.setRole(Roles.ALUNO);
         novoAluno.setEnabled(true);
         novoAluno.setFotoUrl(data.fotoUrl());
         novoAluno.setTurma(turma);
+        novoAluno.setSenhaTemporaria(true);
 
         return alunoRepository.save(novoAluno);
     }
 
     public List<Aluno> getAlunos(){
-        List<Aluno> alunos = alunoRepository.findAll();
-        
-        if (alunos.isEmpty()){
-            return null;
-        }
-
-        return alunos;
-
+        return alunoRepository.findAll();
     }
 
     public Aluno getAlunoById(UUID id){
-        Optional<Aluno> aluno = alunoRepository.findById(id);
-
-        if (aluno.isEmpty()){
-            return null;
-        }
-
-        return aluno.get();
+        return alunoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Aluno não encontrado com o id: " + id));
     }
 
     public Aluno updateAluno(UUID id, AlunoCadastroDTO data){
         Turma turma = turmaRepository.findById(data.turmaId()).orElseThrow(() -> new RuntimeException("Turma não encontrada com o id: " + data.turmaId()));
-        Optional<Aluno> alunoOptional = alunoRepository.findById(id);
 
-        if (alunoOptional.isEmpty()){
-            return null;
-        }
+        Aluno alunoExistente = alunoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Aluno não encontrado com o id: " + id));
 
-        String novaSenha = passwordEncoder.encode(data.password());
-
-        Aluno alunoExistente = alunoOptional.get();
         alunoExistente.setNome(data.nome());
-        alunoExistente.setLogin(data.login());
         alunoExistente.setMatricula(data.matricula());
-        alunoExistente.setPassword(novaSenha);
+        alunoExistente.setLogin(data.matricula());
         alunoExistente.setTurma(turma);
+
         return this.alunoRepository.save(alunoExistente);
     }
 
@@ -101,6 +90,30 @@ public class AlunoService {
     public List<Aluno> buscarAlunos(String termoBusca){
         Pageable limite = PageRequest.of(0, 10);
         return alunoRepository.buscaRapidaPorNome(termoBusca, limite);
+    }
+
+    public void alterarSenha(String login, String senhaAntiga, String novaSenha){
+        Aluno aluno = alunoRepository.findByLogin(login)
+            .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        if (!passwordEncoder.matches(senhaAntiga, aluno.getPassword())){
+            throw new RuntimeException("Senha antiga incorreta");
+        }
+
+        aluno.setPassword(passwordEncoder.encode(novaSenha));
+        aluno.setSenhaTemporaria(false);
+        alunoRepository.save(aluno);
+    }
+
+    public String resetarSenha(UUID alunoId){
+        Aluno aluno = alunoRepository.findById(alunoId)
+            .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        String senhaTemporaria = "A@" + aluno.getMatricula().substring(Math.max(0, aluno.getMatricula().length() - 4));
+        aluno.setPassword(passwordEncoder.encode(senhaTemporaria));
+        aluno.setSenhaTemporaria(true);
+        alunoRepository.save(aluno);
+        return senhaTemporaria;
     }
 
 }

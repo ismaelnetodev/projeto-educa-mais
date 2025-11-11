@@ -2,7 +2,6 @@ package com.educamais.app.security;
 
 import java.util.List;
 
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -46,6 +45,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.POST, "/alunos").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.PUT, "/alunos/**").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.DELETE, "/alunos/**").hasRole("ADMIN");
+                    req.requestMatchers(HttpMethod.PUT, "/alunos/*/resetar-senha").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.POST, "/turmas").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.PUT, "/turmas/**").hasRole("ADMIN");
                     req.requestMatchers(HttpMethod.DELETE, "/turmas/**").hasRole("ADMIN");
@@ -69,6 +69,7 @@ public class SecurityConfigurations {
                     req.requestMatchers(HttpMethod.GET, "/simulados/aluno/minhas-provas").hasRole("ALUNO");
                     req.requestMatchers(HttpMethod.POST, "/simulados/{simuladoId}/submeter").hasRole("ALUNO");
                     req.requestMatchers(HttpMethod.GET, "/perfil/aluno").hasRole("ALUNO");
+                    req.requestMatchers(HttpMethod.PUT, "/alunos/alterar-senha").hasRole("ALUNO");
 
                     req.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     req.requestMatchers(HttpMethod.POST, "/upload/photo").authenticated();

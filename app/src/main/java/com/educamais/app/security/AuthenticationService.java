@@ -24,7 +24,7 @@ public class AuthenticationService implements UserDetailsService{
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDetails user = this.alunoRepository.findByLogin(username);
+        UserDetails user = alunoRepository.findByMatricula(username).orElse(null);
 
         if (user == null){
             user = this.professorRepository.findByLogin(username);

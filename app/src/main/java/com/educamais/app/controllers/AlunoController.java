@@ -6,11 +6,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.educamais.app.dtos.AlterarSenhaDTO;
 import com.educamais.app.dtos.AlunoCadastroDTO;
 import com.educamais.app.dtos.AlunoResponseDTO;
 import com.educamais.app.dtos.AvaliacaoResponseDTO;
@@ -18,6 +20,8 @@ import com.educamais.app.model.Aluno;
 import com.educamais.app.model.AvaliacaoQualitativa;
 import com.educamais.app.services.AlunoService;
 import com.educamais.app.services.AvaliacaoQualitativaService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -128,6 +132,24 @@ public class AlunoController {
         return ResponseEntity.ok(dtos);
     }
     
-    
+    @PutMapping("{id}/resetar-senha")
+    public ResponseEntity<String> resetarSenha(@PathVariable UUID id) {
+        try {
+            String senhaTemporaria = alunoService.resetarSenha(id);
+            return ResponseEntity.ok("Senha redefinida. Senha temporária gerada: " + senhaTemporaria);
+        } catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/alterar-senha")
+    public ResponseEntity<String> alterarSenha(@Valid @RequestBody AlterarSenhaDTO data, Authentication authentication) {
+        try{
+            alunoService.alterarSenha(authentication.getName(), data.senhaAntiga(), data.novaSenha());
+            return ResponseEntity.ok("Senha alterada com sucesso.");
+        } catch (RuntimeException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 }

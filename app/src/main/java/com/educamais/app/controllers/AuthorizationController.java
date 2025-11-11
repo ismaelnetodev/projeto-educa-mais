@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.educamais.app.dtos.LoginDTO;
 import com.educamais.app.dtos.LoginResponseDTO;
+import com.educamais.app.model.Aluno;
 import com.educamais.app.model.User;
 import com.educamais.app.security.TokenService;
 
@@ -31,8 +32,12 @@ public class AuthorizationController {
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
         var token = tokenService.generateToken(user);
-        var role = user.getRole().toString();
-        var responseDTO = new LoginResponseDTO(token, role);
-        return ResponseEntity.ok(responseDTO);
+        boolean senhaTemporaria = false;
+
+        if (user instanceof Aluno aluno){
+            senhaTemporaria = aluno.isSenhaTemporaria();
+        }
+
+        return ResponseEntity.ok(new LoginResponseDTO(token, user.getRole().toString(), senhaTemporaria));
     }
 }
