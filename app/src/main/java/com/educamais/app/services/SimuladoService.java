@@ -14,10 +14,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.educamais.app.dtos.QuestaoResponseDTO;
 import com.educamais.app.dtos.QuestaoResumoDTO;
 import com.educamais.app.dtos.RespostaSimuladoDTO;
 import com.educamais.app.dtos.SimuladoAlunoResponseDTO;
+import com.educamais.app.dtos.SimuladoCriarDTO;
 import com.educamais.app.dtos.SimuladoGerarDTO;
 import com.educamais.app.dtos.SimuladoParaFazerDTO;
 import com.educamais.app.dtos.SimuladoResponseDTO;
@@ -293,6 +293,39 @@ public class SimuladoService {
             questaoResumoList
         );
 
+    }
+
+    @Transactional
+    public SimuladoResponseDTO criarSimuladoComQuestoes(SimuladoCriarDTO data){
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Professor professor = (Professor) professorRepository.findByLogin(login);
+
+        if (professor == null) throw new RuntimeException("Professor não autenticado.");
+
+        Turma turma = turmaRepository.findById(data.turmaId()).orElseThrow(() -> new RuntimeException("Turma não encontrada."));
+
+        Disciplina disciplina = disciplinaRepository.findById(data.disciplinaId()).orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+
+        if (data.questoesId() == null || data.questoesId().isEmpty()){
+            throw new RuntimeException("Nenhuma questão selecionada");
+        }
+
+        List<Questao> questoesSelecionadas = questaoRepository.findAllById(data.questoesId());
+
+        Simulado novoSimulado = new Simulado();
+        novoSimulado.setTitulo(data.titulo());
+        novoSimulado.setDataCriacao(LocalDateTime.now());
+        novoSimulado.setProfessor(professor);
+        novoSimulado.setTurma(turma);
+        novoSimulado.setQuestoes(questoesSelecionadas);
+        novoSimulado.setDisciplina(disciplina);
+        novoSimulado.setDataInicioDisponivel(data.inicioDisponivel());
+        novoSimulado.setDataFimDisponivel(data.fimDisponivel());
+
+        Simulado salvo = simuladoRepository.save(novoSimulado);
+
+        return new SimuladoResponseDTO(salvo);
+        
     }
 
     @Transactional(readOnly = true)

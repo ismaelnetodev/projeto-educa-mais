@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.educamais.app.dtos.SimuladoAlunoResponseDTO;
+import com.educamais.app.dtos.SimuladoCriarDTO;
 import com.educamais.app.dtos.SimuladoGerarDTO;
 import com.educamais.app.dtos.SimuladoParaFazerDTO;
 import com.educamais.app.dtos.SimuladoResponseDTO;
@@ -11,7 +12,6 @@ import com.educamais.app.dtos.SimuladoResumoDTO;
 import com.educamais.app.dtos.SimuladoSubmeterDTO;
 import com.educamais.app.services.SimuladoService;
 
-import io.micrometer.core.ipc.http.HttpSender.Response;
 
 import java.util.List;
 
@@ -109,6 +109,12 @@ public class SimuladoController {
         Pageable pageable = PageRequest.of(page, size);
         return simuladoService.getAlunosDoSimulado(simuladoId, pageable);
     }
+
+    @PostMapping("/criar")
+    public ResponseEntity<SimuladoResponseDTO> criarSimulado(@RequestBody SimuladoCriarDTO data) {
+        return ResponseEntity.ok(simuladoService.criarSimuladoComQuestoes(data));
+    }
+    
     
 
 }
