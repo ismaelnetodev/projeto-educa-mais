@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -58,16 +60,15 @@ public class AlunoController {
     
 
     @GetMapping
-    public ResponseEntity<List<AlunoResponseDTO>> listarAlunos(){
-        List<Aluno> alunos = alunoService.getAlunos();
-
-        if (alunos == null || alunos.isEmpty()){
+    public ResponseEntity<Page<AlunoResponseDTO>> listarAlunos(@RequestParam(value = "termo", required = false) String termo, Pageable pageable){
+        
+        Page<Aluno> alunosPage = alunoService.getAlunos(termo, pageable);
+        
+        if (alunosPage.isEmpty()){
             return ResponseEntity.notFound().build();
         }
 
-        List<AlunoResponseDTO> responseDTOs = alunos.stream()
-            .map(AlunoResponseDTO::new)
-            .collect(Collectors.toList());
+        Page<AlunoResponseDTO> responseDTOs = alunosPage.map(AlunoResponseDTO::new);
 
         return ResponseEntity.ok().body(responseDTOs);
     }
@@ -121,17 +122,6 @@ public class AlunoController {
         }
     }
 
-    @GetMapping("/buscar")
-    public ResponseEntity<List<AlunoResponseDTO>> buscarAluno(@RequestParam("termo") String termo) {
-        List<Aluno> alunos = alunoService.buscarAlunos(termo);
-        
-        List<AlunoResponseDTO> dtos = alunos.stream()
-            .map(AlunoResponseDTO::new)
-            .collect(Collectors.toList());
-
-        return ResponseEntity.ok(dtos);
-    }
-    
     @PutMapping("{id}/resetar-senha")
     public ResponseEntity<String> resetarSenha(@PathVariable UUID id) {
         try {

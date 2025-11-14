@@ -1,14 +1,13 @@
 package com.educamais.app.services;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import com.educamais.app.dtos.AlunoCadastroDTO;
 import com.educamais.app.enums.Roles;
@@ -53,8 +52,12 @@ public class AlunoService {
         return alunoRepository.save(novoAluno);
     }
 
-    public List<Aluno> getAlunos(){
-        return alunoRepository.findAll();
+    public Page<Aluno> getAlunos(String termoBusca, Pageable pageable){
+        if (termoBusca == null || termoBusca.trim().isEmpty()){
+            return alunoRepository.findAll(pageable);
+        } else {
+            return alunoRepository.buscaRapidaPorNome(termoBusca, pageable);
+        }
     }
 
     public Aluno getAlunoById(UUID id){
@@ -86,11 +89,6 @@ public class AlunoService {
         return null;
     }
 
-    @Transactional(readOnly = true)
-    public List<Aluno> buscarAlunos(String termoBusca){
-        Pageable limite = PageRequest.of(0, 10);
-        return alunoRepository.buscaRapidaPorNome(termoBusca, limite);
-    }
 
     public void alterarSenha(String login, String senhaAntiga, String novaSenha){
         Aluno aluno = alunoRepository.findByLogin(login)

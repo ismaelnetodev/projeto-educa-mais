@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,6 @@ public interface AlunoRepository extends JpaRepository<Aluno, UUID>{
     Optional<Aluno> findByMatricula(String matricula);
     
     @Query("SELECT a FROM Aluno a WHERE UPPER(a.nome) LIKE UPPER(CONCAT(:termoBusca, '%'))")
-    List<Aluno> buscaRapidaPorNome(@Param("termoBusca") String termoBusca, Pageable pageable);
+    Page<Aluno> buscaRapidaPorNome(@Param("termoBusca") String termoBusca, Pageable pageable);
 
 }
