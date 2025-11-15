@@ -1,5 +1,6 @@
 package com.educamais.app.security;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -83,10 +84,28 @@ public class SecurityConfigurations {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(false);
+        List<String> allowedOrigins = new ArrayList<>();
+
+        allowedOrigins.add("https://projeto-educa-mais.onrender.com");
+        allowedOrigins.add("http://localhost:4200");      // Angular dev
+        allowedOrigins.add("http://localhost:8100");      // Ionic dev
+        allowedOrigins.add("http://localhost:3000");      // React dev
+        allowedOrigins.add("capacitor://localhost");      // Ionic/Capacitor
+        allowedOrigins.add("ionic://localhost");          // Ionic legacy
+        allowedOrigins.add("http://localhost");           // Genérico
+
+        config.setAllowedOriginPatterns(allowedOrigins);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedHeaders(List.of(
+            "Authorization",
+            "Content-Type",
+            "Accept",
+            "Origin",
+            "X-Requested-With"
+        ));
+        config.setExposedHeaders(List.of("Authorization"));
+        config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

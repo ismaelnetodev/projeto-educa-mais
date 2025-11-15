@@ -82,15 +82,14 @@ public class QuestaoService {
     public boolean deleteQuestao(Long id){
         Professor professor = getProfessorLogado();
 
-        Optional<Questao> questaoOpcional = questaoRepository.findById(id);
-        Questao questao = questaoOpcional.get();
+        Questao questao = questaoRepository.findById(id).orElseThrow(() -> new RuntimeException("Questão não encontrada com o ID: " + id));
 
         if (!questao.getProfessorCriador().getId().equals(professor.getId())) {
             throw new RuntimeException("Acesso Negado: Você só pode deletar suas próprias questões.");
         }
 
         questaoRepository.deleteById(id);
-        return false;
+        return true;
     }
 
     @Transactional

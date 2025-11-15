@@ -8,10 +8,9 @@ import com.educamais.app.dtos.QuestaoResponseDTO;
 import com.educamais.app.model.Questao;
 import com.educamais.app.services.QuestaoService;
 
-import io.micrometer.core.ipc.http.HttpSender.Response;
+import jakarta.validation.Valid;
 
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -61,7 +59,7 @@ public class QuestaoController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> criarQuestao(@RequestBody QuestaoCadastroDTO data) {
+    public ResponseEntity<?> criarQuestao(@Valid @RequestBody QuestaoCadastroDTO data) {
         try{
             Questao questao = questaoService.criarQuestao(data);
             QuestaoResponseDTO questaoResponse = new QuestaoResponseDTO(questao);

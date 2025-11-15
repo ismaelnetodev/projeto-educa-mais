@@ -1,6 +1,10 @@
 package com.educamais.app.security;
 
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +23,11 @@ public class TokenService {
     public String generateToken(User user){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secretKey);
-
+            Instant expiresAt = Instant.now().plus(5, ChronoUnit.DAYS);
             String token = JWT.create()
                             .withIssuer("API EducaMais")
                             .withSubject(user.getUsername())
+                            .withExpiresAt(Date.from(expiresAt))
                             .sign(algorithm);
             return token;
         }catch (JWTCreationException exception){

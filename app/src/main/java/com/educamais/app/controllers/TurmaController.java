@@ -22,6 +22,8 @@ import com.educamais.app.model.Aluno;
 import com.educamais.app.model.Turma;
 import com.educamais.app.services.TurmaService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -62,7 +64,7 @@ public class TurmaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> criarTurma(@RequestBody TurmaCadastroDTO data){
+    public ResponseEntity<?> criarTurma(@Valid @RequestBody TurmaCadastroDTO data){
         Turma turmaSalva = this.turmaService.criarTurma(data);
 
         if (turmaSalva == null){

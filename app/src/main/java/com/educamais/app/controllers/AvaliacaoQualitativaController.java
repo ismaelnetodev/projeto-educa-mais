@@ -8,6 +8,7 @@ import com.educamais.app.dtos.AvaliacaoResponseDTO;
 import com.educamais.app.model.AvaliacaoQualitativa;
 import com.educamais.app.services.AvaliacaoQualitativaService;
 
+import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class AvaliacaoQualitativaController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> registrarAvaliacao(@RequestBody AvaliacaoCadastroDTO data) {
+    public ResponseEntity<?> registrarAvaliacao(@Valid @RequestBody AvaliacaoCadastroDTO data) {
         try{
             AvaliacaoQualitativa avaliacaoSalva = avaliacaoQualitativaService.registrarAvaliacao(data);
 

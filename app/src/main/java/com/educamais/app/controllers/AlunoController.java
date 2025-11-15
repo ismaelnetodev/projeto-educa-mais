@@ -33,8 +33,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 
-
-
 @RestController
 @RequestMapping("/alunos")
 public class AlunoController {
@@ -48,7 +46,7 @@ public class AlunoController {
     }
 
     @PostMapping()
-    public ResponseEntity<?> criarALuno(@RequestBody AlunoCadastroDTO data) {
+    public ResponseEntity<?> criarALuno(@Valid @RequestBody AlunoCadastroDTO data) {
         try{
             Aluno alunoSalvo = this.alunoService.criarAluno(data);
             AlunoResponseDTO responseDTO = new AlunoResponseDTO(alunoSalvo);
@@ -86,7 +84,7 @@ public class AlunoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AlunoResponseDTO> updateAluno(@PathVariable UUID id, @RequestBody AlunoCadastroDTO data) {
+    public ResponseEntity<AlunoResponseDTO> updateAluno(@PathVariable UUID id, @Valid @RequestBody AlunoCadastroDTO data) {
         Aluno alunoAtualizado = this.alunoService.updateAluno(id, data);
 
         if (alunoAtualizado == null){

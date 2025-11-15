@@ -14,6 +14,8 @@ import com.educamais.app.model.Aluno;
 import com.educamais.app.model.User;
 import com.educamais.app.security.TokenService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthorizationController {
@@ -27,7 +29,7 @@ public class AuthorizationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginDTO data){
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginDTO data){
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
         var auth = this.authenticationManager.authenticate(usernamePassword);
         var user = (User) auth.getPrincipal();
